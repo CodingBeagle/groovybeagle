@@ -1,3 +1,4 @@
+import org.lwjgl.system.*
 import org.lwjgl.system.MemoryUtil.*
 
 import org.lwjgl.glfw.*;
@@ -109,8 +110,24 @@ fun init() {
     glEnable(GL_DEBUG_OUTPUT)
 
     // Register error callback function to the OpenGL context
-    glDebugMessageCallback(GLDebugMessageCallbackI { source, type, id, severity, length, message, userParam ->
+    // Here we are using the Kotlin SAM feature.
+    // SAM Conversions can take function literals and automatically convert them into implementations
+    // of Java interfaces that has a single non-default method, as long as the parameter types
+    // of the Kotlin function matches the parameter types of the interface method.
+    /*
+        TODO:
+         I'm not sure why, but implementations of GLDebugMessageCallbackI are what is known as Callbacks, which
+         are native resources. When calling glDebugMessageCallback, native resources must be stored as state
+         and be explicitly deallocated when no longer used.
+         This is what I do in the "cleanup" method.
+         Try and figure out what callbacks need some kind of memory allocated for them.
+     */
+    glDebugMessageCallback({ source, type, id, severity, messageLength, messageMemoryAddress, userParam ->
+        val errorMessage = GLDebugMessageCallback.getMessage(messageLength, messageMemoryAddress)
 
+        println("**** OpenGL Error ****")
+        println("Error Message: $errorMessage")
+        println("**********************")
     }, 0)
 
     // Enable v-sync
@@ -139,6 +156,6 @@ fun cleanup() {
     println("Cleaning up...")
 
     // Clean up debug callback function
-    GLDebugMessageCallback.create(glGetPointer(GL_DEBUG_CALLBACK_FUNCTION)).free();
+    GLDebugMessageCallback.create(glGetPointer(GL_DEBUG_CALLBACK_FUNCTION)).free()
 }
 
