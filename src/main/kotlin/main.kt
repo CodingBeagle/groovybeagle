@@ -32,7 +32,7 @@ fun init() {
 
     // Initialize GLFW.
     // This has to be done before any other GLFW functions can be used.
-    if ( !glfwInit() ) {
+    if (!glfwInit()) {
         throw RuntimeException("Failed to initialize GLFW!")
     }
 
@@ -81,7 +81,8 @@ fun init() {
         // It will evaluate the expression on the right side in the case that the left side is null.
         // We do this because the rest of the code in this block does not make sense if we fail to retrieve the
         // vidMode
-        val vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor()) ?: throw RuntimeException("Failed to retrieve video mode.");
+        val vidMode =
+            glfwGetVideoMode(glfwGetPrimaryMonitor()) ?: throw RuntimeException("Failed to retrieve video mode.");
 
         // Center the window
         glfwSetWindowPos(
@@ -135,8 +136,6 @@ fun init() {
 
     // Make the window visible
     glfwShowWindow(windowHandle)
-
-    glBindBuffer(GL15.GL_ARRAY_BUFFER, 3)
 }
 
 fun loop() {
