@@ -1,13 +1,11 @@
-import org.lwjgl.system.*
-import org.lwjgl.system.MemoryUtil.*
-
+import groovybeagle.core.Shader
+import groovybeagle.core.Texture
 import org.lwjgl.glfw.*;
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.*
+import org.lwjgl.opengl.GL43.*
 
 import org.lwjgl.system.MemoryStack.*
-import org.lwjgl.opengl.GL33.*
-import org.lwjgl.opengl.GL43.*
 
 var windowHandle: Long = 0
 
@@ -139,6 +137,9 @@ fun init() {
 }
 
 fun loop() {
+    val beagleTexture = Texture()
+    beagleTexture.loadFromImage("engineResources/beagle.jpg")
+
     // Set the clear color
     glClearColor(1.0f, 0.0f, 0.0f, 0.0f)
 

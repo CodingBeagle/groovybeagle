@@ -1,6 +1,22 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
+    <JavaCodeStyleSettings>
+      <option name="PACKAGES_TO_USE_IMPORT_ON_DEMAND">
+        <value>
+          <package name="java.awt" withSubpackages="false" static="false" />
+          <package name="import org.lwjgl.opengl" withSubpackages="true" static="true" />
+          <package name="javax.swing" withSubpackages="false" static="false" />
+        </value>
+      </option>
+    </JavaCodeStyleSettings>
     <JetCodeStyleSettings>
+      <option name="PACKAGES_TO_USE_STAR_IMPORTS">
+        <value>
+          <package name="java.util" withSubpackages="false" static="false" />
+          <package name="import org.lwjgl.opengl" withSubpackages="true" static="false" />
+          <package name="kotlinx.android.synthetic" withSubpackages="true" static="false" />
+        </value>
+      </option>
       <option name="CODE_STYLE_DEFAULTS" value="KOTLIN_OFFICIAL" />
     </JetCodeStyleSettings>
     <codeStyleSettings language="kotlin">

@@ -54,8 +54,26 @@ project.ext.lwjglNatives = "natives-windows"
 
 dependencies {
     // We need a dependency on the Kotlin standard library
+    /*
+        One thing that plugins can define are predefined "configurations", such as "implementation" that you see
+        below.
+
+        A configuration helps define the scope of the specified dependency. Some dependencies might only be used
+        for compiling code, whilst others should be used at runtime, and some dependencies at runtime should only be
+        visible to the internals of your code, whilst other dependencies might need to be a visible API to
+        other consumers. This is what configurations are used for.
+
+        The "implementation" configuration comes from the Kotlin plugin.
+
+        So far, I only use "implementation" dependencies because I'm only interested in them being internal to my
+        engine.
+     */
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
+    // JOML dependency
+    implementation "org.joml:joml:1.9.19"
+
+    // LWJGL dependencies
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
     implementation "org.lwjgl:lwjgl"
