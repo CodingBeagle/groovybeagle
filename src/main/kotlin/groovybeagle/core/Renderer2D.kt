@@ -1,6 +1,7 @@
 package groovybeagle.core
 
 import org.joml.Matrix4f
+import org.joml.Vector2f
 import org.joml.Vector3f
 import org.lwjgl.opengl.GL43.*
 import java.io.File
@@ -49,6 +50,7 @@ class Renderer2D {
         // glBindBuffer will bind a buffer object to a specified buffer binding pointer.
         // GL_ARRAY_BUFFER is used for VBO's (Vertex Buffer Objects).
         glBindBuffer(GL_ARRAY_BUFFER, quadVBO)
+        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW)
 
         // A Vertex Array Object is an OpenGL object that stores all state needed to supply vertex data.
         // It will store:
@@ -56,7 +58,6 @@ class Renderer2D {
         // - The buffer objects used (which indirectly happens through calls to glVertexAttribPointer)
         // - Element Array Buffer Bindings
         var quadVAO = glGenVertexArrays()
-
         glBindVertexArray(quadVAO)
 
         // An Element Array Buffer is a buffer used to store indices for rendering primitives
@@ -102,7 +103,7 @@ class Renderer2D {
         // Thus, the entities in our 2D world will be specified in terms of positions in the width and height of our window, and these will then,
         // by this orthographic project matrix, be scaled down into the unit cube that OpenGL will clip against.
         var projection = Matrix4f()
-            .ortho2D(0.0f, 800.0f, 0.0f, 600.0f)
+            .ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f)
 
         shaderProgram.setMatrix4("projection", projection)
     }
@@ -111,6 +112,7 @@ class Renderer2D {
         shaderProgram.use()
 
         sprite.texture.use()
+        sprite.position = Vector2f(100f, 100f)
 
         val modelMatrix = Matrix4f()
             .identity()

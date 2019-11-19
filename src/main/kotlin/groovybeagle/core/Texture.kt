@@ -7,6 +7,12 @@ import org.lwjgl.system.MemoryStack.stackPush
 class Texture constructor(imagePath: String) : NativeResource {
     private var didDelete = false
 
+    var width: Float = 0f
+        private set
+
+    var height: Float = 0f
+        private set
+
     var textureObject = 0
         private set
 
@@ -50,6 +56,9 @@ class Texture constructor(imagePath: String) : NativeResource {
                 imageData)
 
             glGenerateMipmap(GL_TEXTURE_2D)
+
+            width = textureWidth.get(0).toFloat()
+            height = textureHeight.get(0).toFloat()
 
             // Cleanup
             glBindTexture(GL_TEXTURE_2D, 0)
