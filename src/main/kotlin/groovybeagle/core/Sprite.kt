@@ -1,5 +1,11 @@
 package groovybeagle.core
 
-class Sprite {
+import org.joml.Vector2f
 
+class Sprite constructor(val texture: Texture) {
+    var angle: Float = 0.0f
+    var position: Vector2f = Vector2f()
+    var scale: Vector2f = Vector2f()
+
+    private var didDelete = false
 }

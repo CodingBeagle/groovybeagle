@@ -24,9 +24,7 @@ import org.lwjgl.system.MemoryStack.stackPush
     Therefore, in the case of native resources acquired through some native APIs, the best course of action seems
     to be to implement a manually controlled create / delete pattern.
  */
-class Shader {
-    private var isDeleted = false
-
+class Shader constructor(sourceCode: String, shaderType: Int) : NativeResource {
     var shaderObject: Int = 0
         get() {
             if (isDeleted)
@@ -38,16 +36,9 @@ class Shader {
             return field
         }
 
-    fun create(sourceCode: String, shaderType: Int) {
-        if (shaderObject != 0)
-            throw RuntimeException("Attempting to create already created shader.")
+    private var isDeleted = false
 
-        // In theory, I could allow for a shader instance to be reused (in the case where delete have been called)
-        // But for now, I'd rather just play it simple and say that you only get to create one shader for once
-        // shader instance.
-        if (isDeleted)
-            throw RuntimeException("Attempting to delete already deleted shader.")
-
+    init {
         shaderObject = glCreateShader(shaderType)
 
         // In Java, a CharSequence is an interface. It represents a readable sequence of char values.
@@ -71,7 +62,7 @@ class Shader {
         }
     }
 
-    fun delete() {
+    override fun dispose() {
         if (isDeleted)
             throw RuntimeException("Attempting to delete shader already deleted.")
 

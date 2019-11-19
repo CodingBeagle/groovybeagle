@@ -4,17 +4,11 @@ import org.joml.Matrix4f
 import org.lwjgl.opengl.GL43.*
 import org.lwjgl.system.MemoryStack.stackPush
 
-class ShaderProgram {
+class ShaderProgram constructor(vertexShader: Shader, fragmentShader: Shader) : NativeResource {
     private var didDelete = false
     private var shaderProgramObject = 0
 
-    fun create(vertexShader: Shader, fragmentShader: Shader) {
-        if (didDelete)
-            throw RuntimeException("Attempted to use already deleted shader program.")
-
-        if (shaderProgramObject != 0)
-            throw RuntimeException("Attmpted to create a shader program already created.")
-
+    init {
         shaderProgramObject = glCreateProgram()
 
         glAttachShader(shaderProgramObject, vertexShader.shaderObject)
@@ -34,14 +28,15 @@ class ShaderProgram {
                 throw RuntimeException("Failed to link shader program with following error $shaderLinkingReport")
             }
         }
+
+        // Cleanup
+        vertexShader.dispose()
+        fragmentShader.dispose()
     }
 
     fun use() {
         if (didDelete)
             throw RuntimeException("Attempted to use already deleted shader program.")
-
-        if (shaderProgramObject == 0)
-            throw RuntimeException("Attempting to use a shader program not yet created.")
 
         glUseProgram(shaderProgramObject)
     }
@@ -49,9 +44,6 @@ class ShaderProgram {
     fun setMatrix4(uniformName: String, matrix: Matrix4f) {
         if (didDelete)
             throw RuntimeException("Attempted to use already deleted shader program.")
-
-        if (shaderProgramObject == 0)
-            throw RuntimeException("Attempting to use a shader program not yet created.")
 
         val stackFrame = stackPush()
         stackFrame.use {
@@ -61,7 +53,7 @@ class ShaderProgram {
         }
     }
 
-    fun delete() {
+    override fun dispose() {
         if (didDelete)
             throw RuntimeException("Atempting to delete shader program already deleted.")
 

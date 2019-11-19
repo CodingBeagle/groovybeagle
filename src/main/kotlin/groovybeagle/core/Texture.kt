@@ -4,17 +4,13 @@ import org.lwjgl.opengl.GL43.*
 import org.lwjgl.stb.STBImage.*
 import org.lwjgl.system.MemoryStack.stackPush
 
-class Texture {
-    var didDelete = false
+class Texture constructor(imagePath: String) : NativeResource {
+    private var didDelete = false
+
     var textureObject = 0
+        private set
 
-    fun loadFromImage(imagePath: String) {
-        if (didDelete)
-            throw RuntimeException("Attempting to use texture already deleted.")
-
-        if (textureObject != 0)
-            throw RuntimeException("Attempting to load a texture already in use.")
-
+    init {
         textureObject = glGenTextures()
 
         glBindTexture(GL_TEXTURE_2D, textureObject)
@@ -64,13 +60,10 @@ class Texture {
         if (didDelete)
             throw RuntimeException("Attempting to use texture already deleted.")
 
-        if (textureObject == 0)
-            throw RuntimeException("Attempting to use texture not yet created.")
-
         glBindTexture(GL_TEXTURE_2D, textureObject)
     }
 
-    fun delete() {
+    override fun dispose() {
         if (didDelete)
             throw RuntimeException("Attempting to delete a texture already deleted.")
 

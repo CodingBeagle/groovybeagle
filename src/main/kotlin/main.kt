@@ -1,4 +1,6 @@
+import groovybeagle.core.Renderer2D
 import groovybeagle.core.Shader
+import groovybeagle.core.Sprite
 import groovybeagle.core.Texture
 import org.lwjgl.glfw.*;
 import org.lwjgl.glfw.GLFW.*
@@ -137,17 +139,18 @@ fun init() {
 }
 
 fun loop() {
-    val beagleTexture = Texture()
-    beagleTexture.loadFromImage("engineResources/beagle.jpg")
+    var renderer2D = Renderer2D()
 
-    // Set the clear color
-    glClearColor(1.0f, 0.0f, 0.0f, 0.0f)
+    var beagleTexture = Texture("engineResources/beagle.jpg")
+
+    var beagleSprite = Sprite(beagleTexture)
 
     while (!glfwWindowShouldClose(windowHandle)) {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
-        glfwSwapBuffers(windowHandle);
+        renderer2D.drawSprite(beagleSprite)
 
+        glfwSwapBuffers(windowHandle);
         glfwPollEvents()
     }
 }
