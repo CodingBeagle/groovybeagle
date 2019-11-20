@@ -2,6 +2,7 @@ import groovybeagle.core.Renderer2D
 import groovybeagle.core.Shader
 import groovybeagle.core.Sprite
 import groovybeagle.core.Texture
+import org.joml.Vector2f
 import org.lwjgl.glfw.*;
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.*
@@ -67,6 +68,14 @@ fun init() {
         This type is used for Java's try-with-resources.
         This function takes a function literal block which gets executed in a try. Afterwards, the object will
         automatically be closed in a "finally".
+
+        The "stachPush" API of LWJGL attempts to imitate a short-lived stack, like you'd have in C and C++.
+        This is because APIs like OpenGL usually have patterns of returning values in parameters passed by reference.
+        Therefore, a lot of times, you need to declare one or more variables, have OpenGL put data in them, and be
+        done with the variables quickly after having used them, such as the case of centering the window.
+
+        With this Stack API, you can allocate off-heap memory on a thread-local memory stack. The performance is also
+        good as the stack push and pop simple makes use of pointer arithmetic.
      */
     val stack = stackPush();
     stack.use {
@@ -144,9 +153,10 @@ fun loop() {
     var beagleTexture = Texture("engineResources/beagle.jpg")
 
     var beagleSprite = Sprite(beagleTexture)
+    beagleSprite.position = Vector2f(400.0f, 300.0f)
 
     while (!glfwWindowShouldClose(windowHandle)) {
-        glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+        glClear(GL_COLOR_BUFFER_BIT.or(GL_DEPTH_BUFFER_BIT))
 
         renderer2D.drawSprite(beagleSprite)
 

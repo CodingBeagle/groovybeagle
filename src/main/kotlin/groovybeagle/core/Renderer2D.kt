@@ -1,9 +1,10 @@
 package groovybeagle.core
 
 import org.joml.Matrix4f
-import org.joml.Vector2f
 import org.joml.Vector3f
+import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL43.*
+import org.lwjgl.system.MemoryUtil
 import java.io.File
 
 class Renderer2D {
@@ -15,7 +16,7 @@ class Renderer2D {
         -1.0f,  1.0f, 0.0f, 1.0f  // Top Left
         )
 
-    private var indices = shortArrayOf(
+    private var indices = intArrayOf(
         0, 1, 2,
         0, 2, 3
     )
@@ -50,7 +51,34 @@ class Renderer2D {
         // glBindBuffer will bind a buffer object to a specified buffer binding pointer.
         // GL_ARRAY_BUFFER is used for VBO's (Vertex Buffer Objects).
         glBindBuffer(GL_ARRAY_BUFFER, quadVBO)
-        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW)
+
+        /*
+            We make use of LWJGLs MemoryUtil API.
+
+            We can use this API when stack allocation (using the Stack API) using ideal. The memory might be
+            too big for the stack, or the allocation might have to be long lived.
+
+            The next best option in that case is explicit memory management, which can be done with the MemoryUtil API.
+
+            The reason we make use of the MemoryUtil API in order to create buffers that wraps around our vertices
+            and indices arrays is that LWJGL requires the use of off-heap memory when passing data to native libraries.
+            Any buffers returned from native libraries are also always backed by off-heap memory.
+
+            Reasons are:
+            - You cannot control the layout of Java objects. Different JVMs and different JVM settings
+            produce very different field layouts. Native libraries always expect data with very precisely defined
+            layouts.
+
+            - Any Java object or array may be moved by the GC at any time, concurrently with the execution of a native
+            method call. All JNI methods are executed at a safepoint, so by definition, must not access heap data.
+         */
+        var verticesBuffer = MemoryUtil.memAllocFloat(vertices.size)
+        verticesBuffer.put(vertices)
+        verticesBuffer.flip()
+
+        glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW)
+
+        MemoryUtil.memFree(verticesBuffer)
 
         // A Vertex Array Object is an OpenGL object that stores all state needed to supply vertex data.
         // It will store:
@@ -65,14 +93,21 @@ class Renderer2D {
 
         // We bind it with our currently bound VAO, because its state is saved with it
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,  quadVEO)
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW)
+
+        var indicesBuffer = MemoryUtil.memAllocInt(indices.size)
+        indicesBuffer.put(indices)
+        indicesBuffer.flip()
+
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW)
+
+        MemoryUtil.memFree(indicesBuffer)
 
         // When calling glVertexAttribPointer, it uses whatever buffer is currently bound to GL_ARRAY_BUFFER target
         // as the source for the vertex array data.
         // This, binding a NEW buffer to GL_ARRAY_BUFFER after this call will do NOTHING to the association between
         // attribute at index 0 and its source. You'd have to rebind the buffer and make ANOTHER call to glVertexAttribPointer
         // for that to happen.
-        glVertexAttribPointer(0, 4, GL_FLOAT, false, 32 * 4, 0)
+        glVertexAttribPointer(0, 4, GL_FLOAT, false, 4 * 4, 0)
         glEnableVertexAttribArray(0)
 
         // Cleanup
@@ -112,21 +147,20 @@ class Renderer2D {
         shaderProgram.use()
 
         sprite.texture.use()
-        sprite.position = Vector2f(100f, 100f)
 
         val modelMatrix = Matrix4f()
             .identity()
             .translate(sprite.position.x, sprite.position.y, 0.0f)
             .rotate(sprite.angle, Vector3f(0.0f, 0.0f, -1.0f))
-            .scale(sprite.scale.x, sprite.scale.y, 1.0f)
+            .scale(sprite.scale.x * 0.5f, sprite.scale.y * 0.5f, 1.0f)
 
         shaderProgram.setMatrix4("model", modelMatrix)
 
         glDrawElements(
             GL_TRIANGLES,
             6,
-            GL_UNSIGNED_SHORT,
-            0
+            GL11.GL_UNSIGNED_INT,
+            0L
         )
 
         // Cleanup
