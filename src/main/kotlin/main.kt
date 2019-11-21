@@ -1,5 +1,4 @@
 import groovybeagle.core.Renderer2D
-import groovybeagle.core.Shader
 import groovybeagle.core.Sprite
 import groovybeagle.core.Texture
 import org.joml.Vector2f
@@ -157,6 +156,8 @@ fun loop() {
 
     while (!glfwWindowShouldClose(windowHandle)) {
         glClear(GL_COLOR_BUFFER_BIT.or(GL_DEPTH_BUFFER_BIT))
+
+        beagleSprite.angle += 0.05f
 
         renderer2D.drawSprite(beagleSprite)
 
