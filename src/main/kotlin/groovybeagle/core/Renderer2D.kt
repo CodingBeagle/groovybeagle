@@ -2,7 +2,6 @@ package groovybeagle.core
 
 import org.joml.Matrix4f
 import org.joml.Vector3f
-import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL43.*
 import org.lwjgl.system.MemoryUtil
 import java.io.File
@@ -152,14 +151,14 @@ class Renderer2D {
             .identity()
             .translate(sprite.position.x, sprite.position.y, 0.0f)
             .rotate(sprite.angle, Vector3f(0.0f, 0.0f, -1.0f))
-            .scale(sprite.scale.x * 0.5f, sprite.scale.y * 0.5f, 1.0f)
+            .scale(sprite.scale.x, sprite.scale.y, 1.0f)
 
         shaderProgram.setMatrix4("model", modelMatrix)
 
         glDrawElements(
             GL_TRIANGLES,
             6,
-            GL11.GL_UNSIGNED_INT,
+            GL_UNSIGNED_INT,
             0L
         )
 

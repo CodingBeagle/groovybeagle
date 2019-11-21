@@ -1,6 +1,4 @@
-import groovybeagle.core.Renderer2D
-import groovybeagle.core.Sprite
-import groovybeagle.core.Texture
+import groovybeagle.core.*
 import org.joml.Vector2f
 import org.lwjgl.glfw.*;
 import org.lwjgl.glfw.GLFW.*
@@ -10,6 +8,7 @@ import org.lwjgl.opengl.GL43.*
 import org.lwjgl.system.MemoryStack.*
 
 var windowHandle: Long = 0
+var input: Input? = null
 
 fun main() {
     init()
@@ -139,6 +138,8 @@ fun init() {
         println("**********************")
     }, 0)
 
+    input = Input(windowHandle)
+
     // Enable v-sync
     glfwSwapInterval(1)
 
@@ -153,15 +154,22 @@ fun loop() {
 
     var beagleSprite = Sprite(beagleTexture)
     beagleSprite.position = Vector2f(400.0f, 300.0f)
+    beagleSprite.scale = Vector2f(beagleSprite.scale.x * 0.5f, beagleSprite.scale.y * 0.5f)
 
     while (!glfwWindowShouldClose(windowHandle)) {
         glClear(GL_COLOR_BUFFER_BIT.or(GL_DEPTH_BUFFER_BIT))
 
-        beagleSprite.angle += 0.05f
+        // TODO: What does this "!!" mean!?
+        if (input!!.isKeyDown(Key.SPACE))
+            beagleSprite.angle += 0.05f
 
         renderer2D.drawSprite(beagleSprite)
 
-        glfwSwapBuffers(windowHandle);
+        glfwSwapBuffers(windowHandle)
+
+        // Event polling is usually done after buffer swapping.
+        // glfwPollEvents() is the best choice when rendering continuously
+        input!!.update()
         glfwPollEvents()
     }
 }
@@ -172,4 +180,3 @@ fun cleanup() {
     // Clean up debug callback function
     GLDebugMessageCallback.create(glGetPointer(GL_DEBUG_CALLBACK_FUNCTION)).free()
 }
-
